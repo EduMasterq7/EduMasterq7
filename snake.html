@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake-Game</title>
+    <link style="border: 50%;" rel="icon" type="image/png" sizes="64x64" href="Edumaster logo (without background) 1.png">
+    <link style="border: 50%;" rel="icon" type="image/png" sizes="32x32" href="Edumaster logo (without background) 1.png">
+    <link rel="apple-touch-icon" href="Edumaster logo (without background) 1.png">
+    <meta name="theme-color" content="#ffffff"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
+    <style>
+        /* Your original CSS variables */
+        :root {
+            --primary-color: #2596be;
+            --secondary-color: #0e9183;
+            --accent-color: #0720f7;
+            --background-color: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --header-height: 80px;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.15);
+            --transition-speed: 0.3s;
+        }
+
+        /* Reset and Base Styles */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+
+        /* Your original header styles */
+        .header {
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--background-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 100%;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo sup {
+            font-size: 1rem;
+            margin-left: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: all var(--transition-speed) ease;
+            transform: translateX(-50%);
+        }
+
+        /* Game specific styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow: hidden;
+            margin-bottom: 39px;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-board {
+            border: 2px solid var(--primary-color);
+            background-color: #f0f0f0;
+        }
+
+        .game-info {
+            display: flex;
+            gap: 2rem;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Your original footer styles */
+        .footer {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Your original header -->
+        <header class="header">
+            <nav class="nav-container">
+                <a href="/" class="logo">Em<sup>2</sup></a>
+                <div class="nav-links">
+                    <a href="homepage.html" class="nav-link">Home</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="game.html" class="nav-link">Game</a>
+                    <a href="donate.html" class="nav-link">Donate</a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <div class="game-container">
+                <div class="game-info">
+                    <p>Score: {{ score }}</p>
+                    <p>High Score: {{ highScore }}</p>
+                </div>
+                <canvas ref="gameBoard" class="game-board" :width="boardWidth" :height="boardHeight"></canvas>
+                <div class="game-controls">
+                    <button class="btn" @click="startGame" v-if="!isPlaying">Start Game</button>
+                    <button class="btn" @click="pauseGame" v-else>Pause</button>
+                </div>
+                <div class="game-over" v-if="gameOver">
+                    <h2>Game Over!</h2>
+                    <p>Final Score: {{ score }}</p>
+                    <button class="btn" @click="startGame">Play Again</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Your original footer -->
+        <footer class="footer">
+            <p><strong>Developed by WebNex ©</strong></p>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    boardWidth: 320,  // Adjusted for better fit
+                    boardHeight: 320, // Adjusted for better fit
+                    tileSize: 16,
+                    snake: [],
+                    food: { x: 0, y: 0 },
+                    direction: { x: 0, y: 0 },
+                    score: 0,
+                    highScore: 0,
+                    isPlaying: false,
+                    gameOver: false,
+                    gameLoop: null
+                }
+            },
+            mounted() {
+                this.ctx = this.$refs.gameBoard.getContext('2d');
+                window.addEventListener('keydown', this.handleKeyPress);
+                this.highScore = parseInt(localStorage.getItem('snakeHighScore') || 0);
+            },
+            methods: {
+                startGame() {
+                    this.snake = [
+                        { x: 5, y: 5 }
+                    ];
+                    this.direction = { x: 1, y: 0 };
+                    this.score = 0;
+                    this.gameOver = false;
+                    this.isPlaying = true;
+                    this.spawnFood();
+                    if (this.gameLoop) clearInterval(this.gameLoop);
+                    this.gameLoop = setInterval(this.update, 125);
+                },
+                pauseGame() {
+                    this.isPlaying = false;
+                    clearInterval(this.gameLoop);
+                },
+                spawnFood() {
+                    const x = Math.floor(Math.random() * (this.boardWidth / this.tileSize));
+                    const y = Math.floor(Math.random() * (this.boardHeight / this.tileSize));
+                    this.food = { x, y };
+
+                    if (this.snake.some(segment => segment.x === x && segment.y === y)) {
+                        this.spawnFood();
+                    }
+                },
+                update() {
+                    const newHead = {
+                        x: this.snake[0].x + this.direction.x,
+                        y: this.snake[0].y + this.direction.y
+                    };
+
+                    if (
+                        newHead.x < 0 || 
+                        newHead.x >= this.boardWidth / this.tileSize ||
+                        newHead.y < 0 || 
+                        newHead.y >= this.boardHeight / this.tileSize ||
+                        this.snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
+                    ) {
+                        this.endGame();
+                        return;
+                    }
+
+                    this.snake.unshift(newHead);
+
+                    if (newHead.x === this.food.x && newHead.y === this.food.y) {
+                        this.score += 10;
+                        this.spawnFood();
+                    } else {
+                        this.snake.pop();
+                    }
+
+                    this.draw();
+                },
+                draw() {
+                    this.ctx.fillStyle = '#f0f0f0';
+                    this.ctx.fillRect(0, 0, this.boardWidth, this.boardHeight);
+
+                    this.ctx.fillStyle = '#2596be';
+                    this.snake.forEach(segment => {
+                        this.ctx.fillRect(
+                            segment.x * this.tileSize,
+                            segment.y * this.tileSize,
+                            this.tileSize - 1,
+                            this.tileSize - 1
+                        );
+                    });
+
+                    this.ctx.fillStyle = '#0e9183';
+                    this.ctx.fillRect(
+                        this.food.x * this.tileSize,
+                        this.food.y * this.tileSize,
+                        this.tileSize - 1,
+                        this.tileSize - 1
+                    );
+                },
+                handleKeyPress(event) {
+                    if (!this.isPlaying) return;
+
+                    switch(event.key) {
+                        case 'ArrowUp':
+                            if (this.direction.y !== 1) {
+                                this.direction = { x: 0, y: -1 };
+                            }
+                            break;
+                        case 'ArrowDown':
+                            if (this.direction.y !== -1) {
+                                this.direction = { x: 0, y: 1 };
+                            }
+                            break;
+                        case 'ArrowLeft':
+                            if (this.direction.x !== 1) {
+                                this.direction = { x: -1, y: 0 };
+                            }
+                            break;
+                        case 'ArrowRight':
+                            if (this.direction.x !== -1) {
+                                this.direction = { x: 1, y: 0 };
+                            }
+                            break;
+                    }
+                },
+                endGame() {
+                    this.isPlaying = false;
+                    this.gameOver = true;
+                    clearInterval(this.gameLoop);
+                    if (this.score > this.highScore) {
+                        this.highScore = this.score;
+                        localStorage.setItem('snakeHighScore', this.score.toString());
+                    }
+                }
+            },
+            beforeUnmount() {
+                window.removeEventListener('keydown', this.handleKeyPress);
+                clearInterval(this.gameLoop);
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
